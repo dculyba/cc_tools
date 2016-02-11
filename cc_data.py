@@ -159,10 +159,10 @@ class CCTrapControlsField(CCField):
     def byte_data(self):
         byte_value = b""
         for trap in self.traps:
-            byte_value += trap.button_coord.x.to_bytes(1, BYTE_ORDER)
-            byte_value += trap.button_coord.y.to_bytes(1, BYTE_ORDER)
-            byte_value += trap.trap_coord.x.to_bytes(1, BYTE_ORDER)
-            byte_value += trap.trap_coord.y.to_bytes(1, BYTE_ORDER)
+            byte_value += trap.button_coord.x.to_bytes(2, BYTE_ORDER)
+            byte_value += trap.button_coord.y.to_bytes(2, BYTE_ORDER)
+            byte_value += trap.trap_coord.x.to_bytes(2, BYTE_ORDER)
+            byte_value += trap.trap_coord.y.to_bytes(2, BYTE_ORDER)
             byte_value += b'\x00\x00' #DAT format says to append 0 to the end of the coordinates
         return byte_value
 
@@ -237,10 +237,10 @@ class CCCloningMachineControlsField(CCField):
     def byte_data(self):
         byte_value = b""
         for machine in self.machines:
-            byte_value += machine.button_coord.x.to_bytes(1, BYTE_ORDER)
-            byte_value += machine.button_coord.y.to_bytes(1, BYTE_ORDER)
-            byte_value += machine.machine_coord.x.to_bytes(1, BYTE_ORDER)
-            byte_value += machine.machine_coord.y.to_bytes(1, BYTE_ORDER)
+            byte_value += machine.button_coord.x.to_bytes(2, BYTE_ORDER)
+            byte_value += machine.button_coord.y.to_bytes(2, BYTE_ORDER)
+            byte_value += machine.machine_coord.x.to_bytes(2, BYTE_ORDER)
+            byte_value += machine.machine_coord.y.to_bytes(2, BYTE_ORDER)
         return byte_value
 
 
