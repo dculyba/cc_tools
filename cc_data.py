@@ -264,7 +264,7 @@ class CCEncodedPasswordField(CCField):
         self.password = password
 
     def __str__(self):
-        return_str = "    Encoded Password Field (type=8)\n"
+        return_str = "    Encoded Password Field (type=6)\n"
         return_str += "      password = "+str(self.password)
         return return_str
 
