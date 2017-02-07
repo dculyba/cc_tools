@@ -319,6 +319,8 @@ class CCMapHintField(CCField):
         return hint_bytes
 
 
+##HERE FOR REFERNECE, BUT NOT SUPPORTED
+##MAKE SURE YOU USE CCEncodedPasswordField for PASSWORDS
 class CCPasswordField(CCField):
     """A class defining an unencoded password
     Member vars:

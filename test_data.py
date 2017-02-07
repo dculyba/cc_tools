@@ -4,33 +4,14 @@ Created for the class Programming for Game Designers
 """
 
 ## Platforms ##
-#This is the base Platform class.
-#It defines a platform as having two pieces of information:
+#This is the Platform class.
+#Note that the initializer takes 2 arguments:
 #  name
 #  launch_year
 class Platform:
-    def __init__(self):
-        self.name = "Unknown"
-        self.launch_year = 0
-
-#These classes extend the base Platform class and fill in specific details
-class AtariLynx(Platform):
-    def __init__(self):
-        self.name = "Atari Lynx"
-        self.launch_year = 1989
-
-
-class Windows3_1(Platform):
-    def __init__(self):
-        self.name = "Windows 3.1"
-        self.launch_year = 1992
-
-
-class Steam(Platform):
-    def __init__(self):
-        self.name = "Steam"
-        self.launch_year = 2003
-## End Platforms ##
+    def __init__(self, name="Unknown", launch_year=0):
+        self.name = name
+        self.launch_year = launch_year
 
 #This is the Game class.
 #Note that the initializer takes 3 arguments:
@@ -51,3 +32,17 @@ class GameLibrary:
 
     def add_game(self, game):
         self.games.append(game)
+
+
+def print_game_library(game_library_data):
+    print("Analyising game library data:")
+    game_count = 0
+    for game in game_library_data.games:
+        print("  Game "+str(game_count))
+        print("    Title = "+game.title)
+        print("    Year  = "+str(game.year))
+        print("    Platform = ")
+        print("       Name = "+game.platform.name)
+        print("       Launch Year = "+str(game.platform.launch_year))
+        game_count += 1
+
