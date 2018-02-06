@@ -33,16 +33,15 @@ class GameLibrary:
     def add_game(self, game):
         self.games.append(game)
 
-
-def print_game_library(game_library_data):
-    print("Analyising game library data:")
-    game_count = 0
-    for game in game_library_data.games:
-        print("  Game "+str(game_count))
-        print("    Title = "+game.title)
-        print("    Year  = "+str(game.year))
-        print("    Platform = ")
-        print("       Name = "+game.platform.name)
-        print("       Launch Year = "+str(game.platform.launch_year))
-        game_count += 1
+    def __str__(self):
+        return_str = "Analyising game library data:\n"
+        game_count = 0
+        for game in self.games:
+            return_str += "  Game " + str(game_count) + "\n"
+            return_str += "    Title = " + game.title + "\n"
+            return_str += "    Year  = " + str(game.year) + "\n"
+            return_str += "    Platform = " + "\n"
+            return_str += "       Name = " + game.platform.name + "\n"
+            return_str += "       Launch Year = " + str(game.platform.launch_year) + "\n"
+            game_count += 1
 
