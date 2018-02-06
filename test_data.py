@@ -34,7 +34,7 @@ class GameLibrary:
         self.games.append(game)
 
     def __str__(self):
-        return_str = "Analyising game library data:\n"
+        return_str = "Analyzing game library data:\n"
         game_count = 0
         for game in self.games:
             return_str += "  Game " + str(game_count) + "\n"
@@ -44,4 +44,5 @@ class GameLibrary:
             return_str += "       Name = " + game.platform.name + "\n"
             return_str += "       Launch Year = " + str(game.platform.launch_year) + "\n"
             game_count += 1
+        return return_str
 
