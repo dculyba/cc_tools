@@ -15,13 +15,3 @@ def make_game_library_from_json( json_data ):
     #Return the completed game_library
 
     return game_library
-
-
-input_json_file = "data/test_data.json"
-
-### Begin Add Code Here ###
-#Open the file specified by input_json_file
-#Use the json module to load the data from the file
-#Use make_game_library_from_json(json_data) to convert the data to GameLibrary data
-#Print out the resulting GameLibrary data using print_game_library(game_library_data) in test_data.py
-### End Add Code Here ###
