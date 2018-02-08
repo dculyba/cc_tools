@@ -1,4 +1,7 @@
 import cc_dat_utils
+import example_data
+import example_json_utils
+import json
 
 #Part 1
 #Use cc_data_utils.make_cc_data_from_dat() to load pfgd_test.dat
@@ -8,11 +11,30 @@ import cc_dat_utils
 
 
 #Part 2 Example
+#Making the data structure manually
+myFam = example_data.Family()
+myFam.parent1 = "Dave"
+myFam.parent2 = "Sabrina"
+
+myKid = example_data.Kid()
+myKid.name = "Hazel"
+myKid.age = 4
+myFam.add_kid(myKid)
+print("Family made in code:")
+print(myFam)
+print("")
+
+#Loading the data from a json file
 example_json_file = "data/example_json.json"
-#Open the file specified by example_json_file
-#Use the json module to load the data from the file
-#Use make_family_from_json(json_data) to convert the data to Family data
-#Print out the resulting Family data using print()
+with open(example_json_file, "r") as reader:
+    family_data = json.load(reader)
+print("JSON data:")
+print(family_data)
+print("")
+
+myFamFromJson = example_json_utils.make_family_from_json(family_data)
+print("Family loaded from JSON:")
+print(myFamFromJson)
 #End Part 2 Example
 
 
