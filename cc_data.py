@@ -434,7 +434,7 @@ class CCLevel:
                 return_str += " {0:3d}".format(v)
             return_str += "\n"
         return_str += "    Lower Layer:\n"
-        for row in range(32):
+        for r in range(32):
             return_str += "    "
             row = self.lower_layer[(r*32):(r*32+32)]
             for v in row:
