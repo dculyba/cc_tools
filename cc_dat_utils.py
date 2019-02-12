@@ -258,6 +258,10 @@ def write_level_to_dat(level, writer):
         level (CCLevel): the level to write
         writer (BufferedWriter): the active writer in binary write mode
     """
+    #lower_layer is not reequired, so handle the case where it is None or 0 length
+    # by making a default layer of all 0s
+    if (level.lower_layer == None or len(level.lower_layer) == 0):
+        level.lower_layer = [0]*1024
     level_bytes = calculate_level_byte_size(level)
     writer.write(level_bytes.to_bytes(2, cc_data.BYTE_ORDER))
     writer.write(level.level_number.to_bytes(2, cc_data.BYTE_ORDER))
