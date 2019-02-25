@@ -13,7 +13,7 @@ class CCField:
     """
 
     def __init__(self, type_val, byte_val):
-        self.type_val = type
+        self.type_val = type_val
         self.byte_val = byte_val
 
     @property
@@ -21,8 +21,8 @@ class CCField:
         return self.byte_val
 
     def __str__(self):
-        return_str = "    Generic Field (type="+self.type_val+")\n"
-        return_str += "      data = "+str(self.byte_val)
+        return_str = "      Generic Field (type="+self.type_val+")\n"
+        return_str += "        data = "+str(self.byte_val)
         return return_str
 
     @property
@@ -48,8 +48,12 @@ class CCMapTitleField(CCField):
         self.title = title
 
     def __str__(self):
-        return_str = "    Map Title Field (type=3)\n"
-        return_str += "      title = '"+str(self.title)+"'"
+        return_str = "      Map Title Field (type=3)\n"
+        return_str += "        title = "
+        if type(self.title) is str:
+            return_str += "'"+str(self.title)+"'"
+        else:
+            return_str += "ERROR: expected 'title' to be a string. It is "+str(type(self.title))
         return return_str
 
     @property
@@ -82,6 +86,8 @@ class CCCoordinate:
         self.y = y
 
     def __str__(self):
+        if type(self.x) != int or type(self.y) != int:
+            return "ERROR: expected 'x' and 'y' to be ints. They are "+str(type(self.x))+" and "+str(type(self.y))+" respectively."
         return "("+str(self.x)+", "+str(self.y)+")"
 
     @property
@@ -132,17 +138,31 @@ class CCTrapControlsField(CCField):
             traps (list of CCTrapControl): the traps
         """
         if __debug__:
+            if type(traps) != list:
+                raise AssertionError("Traps controls must be a list of CCTrapControl. Value passed = '"+str(traps)+"'")
             if len(traps) > 25:
                 raise AssertionError("Max trap count exceeded. Max trap count is 25. Number of traps passed = "+str(len(traps)))
         self.type_val = CCTrapControlsField.TYPE
         self.traps = traps
 
     def __str__(self):
-        return_str = "    Trap Controls Field (type=4)\n"
-        for trap in self.traps:
-            return_str += "      trap = "+str(trap)
-            if trap != self.traps[-1]:
-                return_str += "\n"
+        return_str = "      Trap Controls Field (type=4)\n"
+        if type(self.traps) is list:
+            if len(self.traps) > 25:
+                return_str += "        ERROR: Max trap count exceeded. Max trap count is 25. Number of traps passed = " + str(len(self.traps))
+            else:
+                count = 0
+                for trap in self.traps:
+                    return_str += "        trap "+str(count)+" = "
+                    if type(trap) is CCTrapControl:
+                        return_str += str(trap)
+                    else:
+                        return_str += "ERROR: expected item to be a CCTrapControl. It is " + str(type(trap))
+                    if trap != self.traps[-1]:
+                        return_str += "\n"
+                    count += 1
+        else:
+            return_str += "        ERROR: expected 'traps' to be a list. It is " + str(type(self.traps))
         return return_str
 
     @property
@@ -210,17 +230,31 @@ class CCCloningMachineControlsField(CCField):
             machines (list of CCCloningMachineControl): the machines
         """
         if __debug__:
-            if len(machines) > 31:
+            if type(machines) != list:
+                raise AssertionError("Cloning machines must be a list of CCCloningMachineControls. Value passed = '"+str(machines)+"'")
+            elif len(machines) > 31:
                 raise AssertionError("Max cloning machine count of 31 exceeded. Number of cloning machines passed = "+str(len(machines)))
         self.type_val = CCCloningMachineControlsField.TYPE
         self.machines = machines
 
     def __str__(self):
-        return_str = "    Cloning Machine Controls Field (type=5)\n"
-        for machine in self.machines:
-            return_str += "      machine = "+str(machine)
-            if machine != self.machines[-1]:
-                return_str += "\n"
+        return_str = "      Cloning Machine Controls Field (type=5)\n"
+        if type(self.machines) is list:
+            if len(self.machines) > 31:
+                return_str += "        ERROR: Max cloning machine count of 31 exceeded. Number of cloning machines passed = " + str(len(self.machines))
+            else:
+                count = 0
+                for machine in self.machines:
+                    return_str += "        machine "+str(count)+" = "
+                    if type(machine) is CCCloningMachineControl:
+                        return_str += str(machine)
+                    else:
+                        return_str += "ERROR: expected item to be a CCCloningMachineControl. It is "+str(type(machine))
+                    if machine != self.machines[-1]:
+                        return_str += "\n"
+                    count += 1
+        else:
+            return_str += "        ERROR: expected 'machines' to be a list. It is " + str(type(self.machines))
         return return_str
 
     @property
@@ -258,14 +292,18 @@ class CCEncodedPasswordField(CCField):
             password (list of ints) : the integer values of an encoded password
         """
         if __debug__:
-            if len(password) > 9 or len(password) < 4:
-                raise AssertionError("Encoded password must be from 4 to 9 characters in length. Password passed is '"+str(password)+"'")
+            if type(password) != list or len(password) > 9 or len(password) < 4:
+                raise AssertionError("Encoded password must be a list from 4 to 9 ints in length. Password passed is '"+str(password)+"'")
         self.type_val = CCEncodedPasswordField.TYPE
         self.password = password
 
     def __str__(self):
-        return_str = "    Encoded Password Field (type=6)\n"
-        return_str += "      password = "+str(self.password)
+        return_str = "      Encoded Password Field (type=6)\n"
+        return_str += "        password = "
+        if type(self.password) is list:
+            return_str += str(self.password)
+        else:
+            return_str += "ERROR: expected 'password' to be a list of ints. It is " + str(type(self.password))
         return return_str
 
     @property
@@ -300,8 +338,12 @@ class CCMapHintField(CCField):
         self.hint = hint
 
     def __str__(self):
-        return_str = "    Map Hint Field (type=7)\n"
-        return_str += "      hint = '"+str(self.hint)+"'"
+        return_str = "      Map Hint Field (type=7)\n"
+        return_str += "        hint = "
+        if type(self.hint) is str:
+            return_str += "'"+str(self.hint)+"'"
+        else:
+            return_str += "ERROR: expected 'hint' to be a string. It is " + str(type(self.hint))
         return return_str
 
     @property
@@ -338,8 +380,8 @@ class CCPasswordField(CCField):
         self.password = password
 
     def __str__(self):
-        return_str = "    Password Field (type=8)\n"
-        return_str += "      password = '"+str(self.password)+"'"
+        return_str = "      Password Field (type=8)\n"
+        return_str += "        password = '"+str(self.password)+"'"
         return return_str
 
     @property
@@ -367,17 +409,32 @@ class CCMonsterMovementField(CCField):
 
     def __init__(self, monsters):
         if __debug__:
+            if type(monsters) != list:
+                raise AssertionError(
+                    "Monsters must be a list of CCCoordinate. Value passed = '" + str(monsters) + "'")
             if len(monsters) > 128:
                 raise AssertionError("Max monster count of 128 exceeded. Number of monsters passed = "+str(len(monsters)))
         self.type_val = CCMonsterMovementField.TYPE
         self.monsters = monsters
 
     def __str__(self):
-        return_str = "    Monster Movement Field (type=10)\n"
-        for monster in self.monsters:
-            return_str += "      monster = "+str(monster)
-            if monster != self.monsters[-1]:
-                return_str += "\n"
+        return_str = "      Monster Movement Field (type=10)\n"
+        if type(self.monsters) is list:
+            if len(self.monsters) > 128:
+                return_str += "        ERROR: Max monster count of 128 exceeded. Number of monsters passed = " + str(len(self.monsters))
+            else:
+                count = 0
+                for monster in self.monsters:
+                    return_str += "        monster " + str(count) + " = "
+                    if type(monster) is CCCoordinate:
+                        return_str += str(monster)
+                    else:
+                        return_str += "ERROR: expected item to be a CCCoordinate. It is "+str(type(monster))
+                    if monster != self.monsters[-1]:
+                        return_str += "\n"
+                    count += 1
+        else:
+            return_str += "        ERROR: expected 'monsters' to be a list. It is "+str(type(self.monsters))
         return return_str
 
     @property
@@ -420,26 +477,65 @@ class CCLevel:
         self.optional_fields = []
 
     def __str__(self):
-        return_str = ""
-        return_str += "  Level #"+str(self.level_number)+"\n"
-        return_str += "    Time Limit = "+str(self.time)+"\n"
-        return_str += "    Chip Count = "+str(self.num_chips)+"\n"
-        for field in self.optional_fields:
-            return_str += str(field) + "\n"
+        return_str = "    Level number = "
+        if type(self.level_number) is int:
+            return_str += str(self.level_number)+"\n"
+        else:
+            return_str += "ERROR: expected 'level_number' to be an int. It is " + str(type(self.level_number)) + "\n"
+        return_str += "    Time Limit = "
+        if type(self.time) is int:
+            return_str += str(self.time)+"\n"
+        else:
+            return_str += "ERROR: expected 'time' to be an int. It is " + str(type(self.time)) + "\n"
+        return_str += "    Chip Count = "
+        if type(self.num_chips) is int:
+            return_str += str(self.num_chips)+"\n"
+        else:
+            return_str += "ERROR: expected 'num_chips' to be an int. It is " + str(type(self.num_chips)) + "\n"
+        return_str += "    Optional Fields:\n"
+        if type(self.optional_fields) is list:
+            count = 0
+            for field in self.optional_fields:
+                if isinstance(field, CCField):
+                    return_str += "     Field "+str(count)+":\n"
+                    if type(field) is CCField:
+                        return_str += "      ERROR: CCField type found."
+                        return_str += " CCField cannot be directly used for optional fields.\n"
+                    else:
+                        return_str += str(field) + "\n"
+                else:
+                    return_str += "      Option Field " + str(count) + ": invalid field value. Got object of type "+str(type(field))+"\n"
+                count += 1
+        else:
+            return_str += "    Optional Fields: ERROR: expected 'optional_fields' to be a list. It is "+str(type(self.optional_fields)) + "\n"
         return_str += "    Upper Layer:\n"
-        for r in range(32):
-            return_str += "    "
-            row = self.upper_layer[(r*32):(r*32+32)]
-            for v in row:
-                return_str += " {0:3d}".format(v)
-            return_str += "\n"
+        if type(self.upper_layer) is list:
+            if len(self.upper_layer) == 1024:
+                for r in range(32):
+                    return_str += "    "
+                    row = self.upper_layer[(r*32):(r*32+32)]
+                    for v in row:
+                        return_str += " {0:3d}".format(v)
+                    return_str += "\n"
+            else:
+                return_str += "      ERROR: expected 'upper_layer' to be of length 1024. It is length " +str(len(self.upper_layer))+"\n"
+        else:
+            return_str += "      ERROR: expected 'upper_layer' to be a list. It is "+str(type(self.upper_layer))+"\n"
         return_str += "    Lower Layer:\n"
-        for r in range(32):
-            return_str += "    "
-            row = self.lower_layer[(r*32):(r*32+32)]
-            for v in row:
-                return_str += " {0:3d}".format(v)
-            return_str += "\n"
+        if type(self.lower_layer) is list or self.lower_layer is None:
+            if self.lower_layer is None or len(self.lower_layer) == 0:
+               return_str += "      VALID EMPTY LAYER\n"
+            elif len(self.lower_layer) == 1024:
+                for r in range(32):
+                    return_str += "    "
+                    row = self.lower_layer[(r*32):(r*32+32)]
+                    for v in row:
+                        return_str += " {0:3d}".format(v)
+                    return_str += "\n"
+            else:
+                return_str += "      ERROR: expected 'lower_layer' to be of length 1024 or 0. It is length " +str(len(self.lower_layer))+"\n"
+        else:
+            return_str += "      ERROR: expected 'lower_layer' to be a list or None. It is "+str(type(self.lower_layer))+"\n"
         return return_str
 
     def add_field(self, field):
@@ -458,9 +554,18 @@ class CCDataFile:
     def __str__(self):
         return_str = ""
         return_str += "Level Pack:\n"
-        for level in self.levels:
-            return_str += str(level)
-
+        if type(self.levels) is list:
+            count = 0
+            for level in self.levels:
+                return_str += "  Level entry "+str(count)+"\n"
+                if type(level) is CCLevel:
+                    return_str += str(level)
+                else:
+                    return_str += "    ERROR: expected entry to be a CCLevel. It is "+str(type(level))
+                count += 1
+                return_str += "\n"
+        else:
+            return_str += "  ERROR: expected 'levels' to be a list. It is "+str(type(self.levels))
         return return_str
 
     @property
