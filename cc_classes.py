@@ -8,12 +8,10 @@ BYTE_ORDER = "little"
 class CCField:
     """The base field class
     Member vars:
-        type_val (int): the type identifier of this class (set to 3)
         byte_val (bytes): the byte data of the field
     """
 
-    def __init__(self, type_val, byte_val):
-        self.type_val = type
+    def __init__(self, byte_val):
         self.byte_val = byte_val
 
     @property
@@ -21,43 +19,26 @@ class CCField:
         return self.byte_val
 
     def __str__(self):
-        return_str = "    Generic Field (type="+self.type_val+")\n"
+        return_str = "    Generic Field (type=?)\n"
         return_str += "      data = "+str(self.byte_val)
         return return_str
-
-    @property
-    def json_data(self):
-        json_field = {}
-        json_field["type"] = self.int_type
-        json_field["value"] = self.byte_val.decode()
-        return json_field
 
 
 class CCMapTitleField(CCField):
     """A class defining the map title field
     Member vars:
-        type_val (int): the type identifier of this class (set to 3)
         title (string): the title, max length 63 characters
     """
-    TYPE = 3
 
     def __init__(self, title):
         if __debug__:
             if len(title) >= 64: raise AssertionError("Map Title must be 63 characters or fewer. Current title is '"+title+"'("+str(len(title))+")")
-        self.type_val = CCMapTitleField.TYPE
         self.title = title
 
     def __str__(self):
         return_str = "    Map Title Field (type=3)\n"
         return_str += "      title = '"+str(self.title)+"'"
         return return_str
-
-    @property
-    def json_data(self):
-        json_field = {}
-        json_field["type"] = self.type_val
-        json_field["title"] = self.title
-        return json_field
 
     @property
     def byte_data(self):
@@ -84,10 +65,6 @@ class CCCoordinate:
     def __str__(self):
         return "("+str(self.x)+", "+str(self.y)+")"
 
-    @property
-    def json_data(self):
-        return {"x":self.x, "y":self.y}
-
 
 class CCTrapControl:
     """A class defining a single trap control
@@ -109,21 +86,12 @@ class CCTrapControl:
     def __str__(self):
         return "button"+str(self.button_coord)+", trap"+str(self.trap_coord)
 
-    @property
-    def json_data(self):
-        json_val = {}
-        json_val["button_coord"] = self.button_coord.json_data
-        json_val["trap_coord"] = self.trap_coord.json_data
-        return json_val
-
 
 class CCTrapControlsField(CCField):
     """A class defining the trap controls field
     Member vars:
-        type_val (int) : the type identifier of this class (set to 4)
         traps (list of CCTrapControl): a list of traps for the map
     """
-    TYPE = 4
 
     def __init__(self, traps):
         """A Trap Control Field is defined by a list of traps
@@ -134,7 +102,6 @@ class CCTrapControlsField(CCField):
         if __debug__:
             if len(traps) > 25:
                 raise AssertionError("Max trap count exceeded. Max trap count is 25. Number of traps passed = "+str(len(traps)))
-        self.type_val = CCTrapControlsField.TYPE
         self.traps = traps
 
     def __str__(self):
@@ -144,16 +111,6 @@ class CCTrapControlsField(CCField):
             if trap != self.traps[-1]:
                 return_str += "\n"
         return return_str
-
-    @property
-    def json_data(self):
-        json_field = {}
-        json_field["type"] = self.type_val
-        traps_data = []
-        for trap in self.traps:
-            traps_data.append(trap.json_data)
-        json_field["traps"] = traps_data
-        return json_field
 
     @property
     def byte_data(self):
@@ -187,21 +144,12 @@ class CCCloningMachineControl:
     def __str__(self):
         return "button"+str(self.button_coord)+", machine"+str(self.machine_coord)
 
-    @property
-    def json_data(self):
-        json_val = {}
-        json_val["button_coord"] = self.button_coord.json_data
-        json_val["machine_coord"] = self.machine_coord.json_data
-        return json_val
-
 
 class CCCloningMachineControlsField(CCField):
     """A class defining the cloning machine controls field
     Member vars:
-        type_val (int) : the type identifier of this class (set to 5)
         machine (list of CCCloningMachineControl): a list of cloning machines for the map
     """
-    TYPE = 5
 
     def __init__(self, machines):
         """A cloning machine control field is defined by a list of machines
@@ -212,7 +160,6 @@ class CCCloningMachineControlsField(CCField):
         if __debug__:
             if len(machines) > 31:
                 raise AssertionError("Max cloning machine count of 31 exceeded. Number of cloning machines passed = "+str(len(machines)))
-        self.type_val = CCCloningMachineControlsField.TYPE
         self.machines = machines
 
     def __str__(self):
@@ -222,16 +169,6 @@ class CCCloningMachineControlsField(CCField):
             if machine != self.machines[-1]:
                 return_str += "\n"
         return return_str
-
-    @property
-    def json_data(self):
-        json_field = {}
-        json_field["type"] = self.type_val
-        machine_data = []
-        for machine in self.machines:
-            machine_data.append(machine.json_data)
-        json_field["machines"] = machine_data
-        return json_field
 
     @property
     def byte_data(self):
@@ -247,10 +184,8 @@ class CCCloningMachineControlsField(CCField):
 class CCEncodedPasswordField(CCField):
     """A class defining an encoded password
     Member vars:
-        type_val (int): the type identifier of this class (set to 6)
         password (list of ints): a password encoded as a list of ints from 4 to 9 ints in length
     """
-    TYPE = 6
 
     def __init__(self, password):
         """Initializes an encoded password
@@ -260,20 +195,12 @@ class CCEncodedPasswordField(CCField):
         if __debug__:
             if len(password) > 9 or len(password) < 4:
                 raise AssertionError("Encoded password must be from 4 to 9 characters in length. Password passed is '"+str(password)+"'")
-        self.type_val = CCEncodedPasswordField.TYPE
         self.password = password
 
     def __str__(self):
         return_str = "    Encoded Password Field (type=6)\n"
         return_str += "      password = "+str(self.password)
         return return_str
-
-    @property
-    def json_data(self):
-        json_field = {}
-        json_field["type"] = self.type_val
-        json_field["password"] = self.password
-        return json_field
 
     @property
     def byte_data(self):
@@ -287,29 +214,19 @@ class CCEncodedPasswordField(CCField):
 class CCMapHintField(CCField):
     """A class defining a hint
     Member vars:
-        type_val (int): the type identifier of this class (set to 7)
         hint (string): the hint for the level max length 127 characters
     """
-    TYPE = 7
 
     def __init__(self, hint):
         if __debug__:
             if len(hint) > 127 or len(hint) < 0:
                 raise AssertionError("Hint must be from 0 to 127 characters in length. Hint passed is '"+hint+"'")
-        self.type_val = CCMapHintField.TYPE
         self.hint = hint
 
     def __str__(self):
         return_str = "    Map Hint Field (type=7)\n"
         return_str += "      hint = '"+str(self.hint)+"'"
         return return_str
-
-    @property
-    def json_data(self):
-        json_field = {}
-        json_field["type"] = self.type_val
-        json_field["hint"] = self.hint
-        return json_field
 
     @property
     def byte_data(self):
@@ -324,30 +241,20 @@ class CCMapHintField(CCField):
 class CCPasswordField(CCField):
     """A class defining an unencoded password
     Member vars:
-        type_val (int): the type identifier of this class (set to 8)
         password (string): the password string, length from 4 to 9 characters
     """
-    TYPE = 8
     password = ""
 
     def __init__(self, password):
         if __debug__:
             if len(password) > 9 or len(password) < 4:
                 raise AssertionError("Password must be from 4 to 9 characters in length. Password passed is '"+password+"'")
-        self.type_val = CCPasswordField.TYPE
         self.password = password
 
     def __str__(self):
         return_str = "    Password Field (type=8)\n"
         return_str += "      password = '"+str(self.password)+"'"
         return return_str
-
-    @property
-    def json_data(self):
-        json_field = {}
-        json_field["type"] = self.type_val
-        json_field["password"] = self.password
-        return json_field
 
     @property
     def byte_data(self):
@@ -360,16 +267,13 @@ class CCPasswordField(CCField):
 class CCMonsterMovementField(CCField):
     """A class defining the monsters that move in a given level
     Member vars:
-        type_val (int): the type identifier of this class (set to 10)
         monsters (list of CCCoordinate): the coordinates of each monster
     """
-    TYPE = 10
 
     def __init__(self, monsters):
         if __debug__:
             if len(monsters) > 128:
                 raise AssertionError("Max monster count of 128 exceeded. Number of monsters passed = "+str(len(monsters)))
-        self.type_val = CCMonsterMovementField.TYPE
         self.monsters = monsters
 
     def __str__(self):
@@ -379,16 +283,6 @@ class CCMonsterMovementField(CCField):
             if monster != self.monsters[-1]:
                 return_str += "\n"
         return return_str
-
-    @property
-    def json_data(self):
-        json_field = {}
-        json_field["type"] = self.type_val
-        monster_data = []
-        for monster in self.monsters:
-            monster_data.append(monster.json_data)
-        json_field["monsters"] = monster_data
-        return json_field
 
     @property
     def byte_data(self):
@@ -446,10 +340,10 @@ class CCLevel:
         self.optional_fields.append(field)
 
 
-class CCDataFile:
-    """A class defining the data of dat file
+class CCLevelPack:
+    """A class defining the data of a pack of cc levels
     Member vars:
-        levels (list of CCLevels): the levels of this dat file
+        levels (list of CCLevels): the levels of this level pack
     """
 
     def __init__(self):

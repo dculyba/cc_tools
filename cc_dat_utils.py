@@ -2,11 +2,10 @@
 Methods for encoding and decoding Chip's Challenge (CC) data to and from binary DAT files
 Created for the class Programming for Game Designers
 """
-import cc_data
+import cc_classes
 
 CC_DAT_HEADER_CODE = b'\xAC\xAA\x02\x00'
 RLE_CODE_INT = 255
-
 READ_ADDRESS = 0
 
 def do_read(reader, byte_count):
@@ -41,55 +40,55 @@ def make_field_from_bytes(field_type, field_bytes):
         field_type (int) : what type of field to construct
         field_bytes (bytes) : the binary data to be used to create the field
     """
-    if field_type == cc_data.CCMapTitleField.TYPE:
-        return cc_data.CCMapTitleField(get_string_from_bytes(field_bytes))
-    elif field_type == cc_data.CCTrapControlsField.TYPE:
+    if field_type == 3:
+        return cc_classes.CCMapTitleField(get_string_from_bytes(field_bytes))
+    elif field_type == 4:
         trap_count = int(len(field_bytes) / 10)
         traps = []
         for t_index in range(trap_count):
             i = t_index * 10
-            bx = int.from_bytes(field_bytes[i:(i + 2)], byteorder=cc_data.BYTE_ORDER)
-            by = int.from_bytes(field_bytes[i + 2:(i + 4)], byteorder=cc_data.BYTE_ORDER)
-            tx = int.from_bytes(field_bytes[i + 4:(i + 6)], byteorder=cc_data.BYTE_ORDER)
-            ty = int.from_bytes(field_bytes[i + 6:(i + 8)], byteorder=cc_data.BYTE_ORDER)
-            traps.append(cc_data.CCTrapControl(bx, by, tx, ty))
-        return cc_data.CCTrapControlsField(traps)
-    elif field_type == cc_data.CCCloningMachineControlsField.TYPE:
+            bx = int.from_bytes(field_bytes[i:(i + 2)], byteorder=cc_classes.BYTE_ORDER)
+            by = int.from_bytes(field_bytes[i + 2:(i + 4)], byteorder=cc_classes.BYTE_ORDER)
+            tx = int.from_bytes(field_bytes[i + 4:(i + 6)], byteorder=cc_classes.BYTE_ORDER)
+            ty = int.from_bytes(field_bytes[i + 6:(i + 8)], byteorder=cc_classes.BYTE_ORDER)
+            traps.append(cc_classes.CCTrapControl(bx, by, tx, ty))
+        return cc_classes.CCTrapControlsField(traps)
+    elif field_type == 5:
         machine_count = int(len(field_bytes) / 8)
         machines = []
         for m_index in range(machine_count):
             i = m_index * 8
-            bx = int.from_bytes(field_bytes[i:(i + 2)], byteorder=cc_data.BYTE_ORDER)
-            by = int.from_bytes(field_bytes[i + 2:(i + 4)], byteorder=cc_data.BYTE_ORDER)
-            tx = int.from_bytes(field_bytes[i + 4:(i + 6)], byteorder=cc_data.BYTE_ORDER)
-            ty = int.from_bytes(field_bytes[i + 6:(i + 8)], byteorder=cc_data.BYTE_ORDER)
-            machines.append(cc_data.CCCloningMachineControl(bx, by, tx, ty))
-        return cc_data.CCCloningMachineControlsField(machines)
-    elif field_type == cc_data.CCEncodedPasswordField.TYPE:
+            bx = int.from_bytes(field_bytes[i:(i + 2)], byteorder=cc_classes.BYTE_ORDER)
+            by = int.from_bytes(field_bytes[i + 2:(i + 4)], byteorder=cc_classes.BYTE_ORDER)
+            tx = int.from_bytes(field_bytes[i + 4:(i + 6)], byteorder=cc_classes.BYTE_ORDER)
+            ty = int.from_bytes(field_bytes[i + 6:(i + 8)], byteorder=cc_classes.BYTE_ORDER)
+            machines.append(cc_classes.CCCloningMachineControl(bx, by, tx, ty))
+        return cc_classes.CCCloningMachineControlsField(machines)
+    elif field_type == 6:
         # passwords are encoded as a list of ints
         password = []
         # A bytes object behaves as a list of integers
         # password data is terminated with a zero, iterate to one short of the end of the array
         for b in field_bytes[0:(len(field_bytes)-1)]:
             password.append(b)
-        return cc_data.CCEncodedPasswordField(password)
-    elif field_type == cc_data.CCMapHintField.TYPE:
-        return cc_data.CCMapHintField(get_string_from_bytes(field_bytes))
-    elif field_type == cc_data.CCPasswordField.TYPE:
-        return cc_data.CCPasswordField(get_string_from_bytes(field_bytes))
-    elif field_type == cc_data.CCMonsterMovementField.TYPE:
+        return cc_classes.CCEncodedPasswordField(password)
+    elif field_type == 7:
+        return cc_classes.CCMapHintField(get_string_from_bytes(field_bytes))
+    elif field_type == 8:
+        return cc_classes.CCPasswordField(get_string_from_bytes(field_bytes))
+    elif field_type == 10:
         monster_count = int(len(field_bytes) / 2)
         monsters = []
         for m_index in range(monster_count):
             i = m_index * 2
-            x = int.from_bytes(field_bytes[i:(i + 1)], byteorder=cc_data.BYTE_ORDER)
-            y = int.from_bytes(field_bytes[i + 1:(i + 2)], byteorder=cc_data.BYTE_ORDER)
-            monsters.append(cc_data.CCCoordinate(x, y))
-        return cc_data.CCMonsterMovementField(monsters)
+            x = int.from_bytes(field_bytes[i:(i + 1)], byteorder=cc_classes.BYTE_ORDER)
+            y = int.from_bytes(field_bytes[i + 1:(i + 2)], byteorder=cc_classes.BYTE_ORDER)
+            monsters.append(cc_classes.CCCoordinate(x, y))
+        return cc_classes.CCMonsterMovementField(monsters)
     else:
         if __debug__:
             raise AssertionError("Unsupported field type: " + str(field_type))
-        return cc_data.CCField(field_type, field_bytes)
+        return cc_classes.CCField(field_type, field_bytes)
 
 
 def make_optional_fields_from_dat(reader):
@@ -102,10 +101,10 @@ def make_optional_fields_from_dat(reader):
         A list of all the constructed optional fields
     """
     fields = []
-    total_optional_field_bytes = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
+    total_optional_field_bytes = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
     while total_optional_field_bytes > 0:
-        field_type = int.from_bytes(do_read(reader, 1), byteorder=cc_data.BYTE_ORDER)
-        byte_count = int.from_bytes(do_read(reader, 1), byteorder=cc_data.BYTE_ORDER)
+        field_type = int.from_bytes(do_read(reader, 1), byteorder=cc_classes.BYTE_ORDER)
+        byte_count = int.from_bytes(do_read(reader, 1), byteorder=cc_classes.BYTE_ORDER)
         byte_vals = do_read(reader, byte_count)
         fields.append(make_field_from_bytes(field_type, byte_vals))
         total_optional_field_bytes -= (byte_count + 2)
@@ -148,16 +147,16 @@ def make_level_from_dat(reader):
     Returns:
         A CCLevel object constructed with the read data
     """
-    level = cc_data.CCLevel()
-    level.num_bytes = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
-    level.level_number = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
-    level.time = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
-    level.num_chips = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
+    level = cc_classes.CCLevel()
+    level.num_bytes = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
+    level.level_number = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
+    level.time = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
+    level.num_chips = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
     # Note: Map Detail is not used and is expected to always be 1
-    map_detail = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
-    upper_layer_byte_count = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
+    map_detail = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
+    upper_layer_byte_count = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
     upper_layer_bytes = do_read(reader, upper_layer_byte_count)
-    lower_layer_byte_count = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
+    lower_layer_byte_count = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
     lower_layer_bytes = do_read(reader, lower_layer_byte_count)
     level.upper_layer = make_layer_from_bytes(upper_layer_bytes)
     level.lower_layer = make_layer_from_bytes(lower_layer_bytes)
@@ -165,21 +164,21 @@ def make_level_from_dat(reader):
     return level
 
 
-def make_cc_data_from_dat(dat_file):
-    """Reads a DAT file and constructs a CCDataFile object out of it
+def make_cc_level_pack_from_dat(dat_file):
+    """Reads a DAT file and constructs a CCLevelPack object out of it
     This code assumes a valid DAT file and does not error check for invalid data
     Args:
         dat_file (string) : the filename of the DAT file to read in
     Returns:
-        A CCDataFile object constructed with the data from the given file
+        A CCLevelPack object constructed with the data from the given file
     """
-    data = cc_data.CCDataFile()
+    data = cc_classes.CCLevelPack()
     with open(dat_file, 'rb') as reader:
         header_bytes = do_read(reader, 4)
         if header_bytes != CC_DAT_HEADER_CODE:
             print("ERROR: Invalid header found. Expected " + str(CC_DAT_HEADER_CODE) + ", but found " + header_bytes)
             return
-        num_levels = int.from_bytes(do_read(reader, 2), byteorder=cc_data.BYTE_ORDER)
+        num_levels = int.from_bytes(do_read(reader, 2), byteorder=cc_classes.BYTE_ORDER)
         for i in range(num_levels):
             level = make_level_from_dat(reader)
             data.levels.append(level)
@@ -230,8 +229,8 @@ def write_field_to_dat(field, writer):
         writer (BufferedWriter): the active writer in binary write mode
     """
     byte_data = field.byte_data
-    writer.write(field.type_val.to_bytes(1, cc_data.BYTE_ORDER))
-    writer.write(len(byte_data).to_bytes(1, cc_data.BYTE_ORDER))
+    writer.write(field.type_val.to_bytes(1, cc_classes.BYTE_ORDER))
+    writer.write(len(byte_data).to_bytes(1, cc_classes.BYTE_ORDER))
     writer.write(byte_data)
 
 
@@ -243,10 +242,10 @@ def write_layer_to_dat(layer, writer):
         writer (BufferedWriter): the active writer in binary write mode
     """
     byte_size = len(layer)
-    writer.write(byte_size.to_bytes(2, cc_data.BYTE_ORDER))
+    writer.write(byte_size.to_bytes(2, cc_classes.BYTE_ORDER))
     for val in layer:
         if type(val) is int:
-            byte_val = val.to_bytes(1, cc_data.BYTE_ORDER)
+            byte_val = val.to_bytes(1, cc_classes.BYTE_ORDER)
         else:
             byte_val = val
         writer.write(byte_val)
@@ -263,20 +262,20 @@ def write_level_to_dat(level, writer):
     if (level.lower_layer == None or len(level.lower_layer) == 0):
         level.lower_layer = [0]*1024
     level_bytes = calculate_level_byte_size(level)
-    writer.write(level_bytes.to_bytes(2, cc_data.BYTE_ORDER))
-    writer.write(level.level_number.to_bytes(2, cc_data.BYTE_ORDER))
-    writer.write(level.time.to_bytes(2, cc_data.BYTE_ORDER))
-    writer.write(level.num_chips.to_bytes(2, cc_data.BYTE_ORDER))
+    writer.write(level_bytes.to_bytes(2, cc_classes.BYTE_ORDER))
+    writer.write(level.level_number.to_bytes(2, cc_classes.BYTE_ORDER))
+    writer.write(level.time.to_bytes(2, cc_classes.BYTE_ORDER))
+    writer.write(level.num_chips.to_bytes(2, cc_classes.BYTE_ORDER))
     writer.write(b'\x01\x00')  # Write the "map detail" which is always a 2 byte number set to 1
     write_layer_to_dat(level.upper_layer, writer)
     write_layer_to_dat(level.lower_layer, writer)
     total_field_byte_size = calculate_total_optional_field_byte_size(level.optional_fields)
-    writer.write(total_field_byte_size.to_bytes(2, cc_data.BYTE_ORDER))
+    writer.write(total_field_byte_size.to_bytes(2, cc_classes.BYTE_ORDER))
     for field in level.optional_fields:
         write_field_to_dat(field, writer)
 
 
-def write_cc_data_to_dat(cc_dat, dat_file):
+def write_cc_level_pack_to_dat(cc_dat, dat_file):
     """Writes the given CC dat in binary form to the file
     Args:
         cc_dat (CCData): the cc data to write
@@ -285,6 +284,6 @@ def write_cc_data_to_dat(cc_dat, dat_file):
     with open(dat_file, 'wb') as writer: # Note: DAT files are opened in binary mode
         # Basic DAT file format is: DAT header, total number of levels, level 1, level 2, etc.
         writer.write(CC_DAT_HEADER_CODE)
-        writer.write(cc_dat.level_count.to_bytes(2, cc_data.BYTE_ORDER))
+        writer.write(cc_dat.level_count.to_bytes(2, cc_classes.BYTE_ORDER))
         for level in cc_dat.levels:
             write_level_to_dat(level, writer)
