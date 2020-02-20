@@ -8,10 +8,12 @@ BYTE_ORDER = "little"
 class CCField:
     """The base field class
     Member vars:
+        type_val (int): the type identifier of this class (set to 3)
         byte_val (bytes): the byte data of the field
     """
 
-    def __init__(self, byte_val):
+    def __init__(self, type_val, byte_val):
+        self.type_val = type_val
         self.byte_val = byte_val
 
     @property
@@ -19,7 +21,7 @@ class CCField:
         return self.byte_val
 
     def __str__(self):
-        return_str = "    Generic Field (type=?)\n"
+        return_str = "    Generic Field (type="+self.type_val+")\n"
         return_str += "      data = "+str(self.byte_val)
         return return_str
 
@@ -34,6 +36,7 @@ class CCMapTitleField(CCField):
         if __debug__:
             if len(title) >= 64: raise AssertionError("Map Title must be 63 characters or fewer. Current title is '"+title+"'("+str(len(title))+")")
         self.title = title
+        self.type_val = 3 #The internal field identifier--used for the DAT file
 
     def __str__(self):
         return_str = "    Map Title Field (type=3)\n"
@@ -103,6 +106,7 @@ class CCTrapControlsField(CCField):
             if len(traps) > 25:
                 raise AssertionError("Max trap count exceeded. Max trap count is 25. Number of traps passed = "+str(len(traps)))
         self.traps = traps
+        self.type_val = 4  # The internal field identifier--used for the DAT file
 
     def __str__(self):
         return_str = "    Trap Controls Field (type=4)\n"
@@ -161,6 +165,7 @@ class CCCloningMachineControlsField(CCField):
             if len(machines) > 31:
                 raise AssertionError("Max cloning machine count of 31 exceeded. Number of cloning machines passed = "+str(len(machines)))
         self.machines = machines
+        self.type_val = 5  # The internal field identifier--used for the DAT file
 
     def __str__(self):
         return_str = "    Cloning Machine Controls Field (type=5)\n"
@@ -196,6 +201,7 @@ class CCEncodedPasswordField(CCField):
             if len(password) > 9 or len(password) < 4:
                 raise AssertionError("Encoded password must be from 4 to 9 characters in length. Password passed is '"+str(password)+"'")
         self.password = password
+        self.type_val = 6  # The internal field identifier--used for the DAT file
 
     def __str__(self):
         return_str = "    Encoded Password Field (type=6)\n"
@@ -222,6 +228,7 @@ class CCMapHintField(CCField):
             if len(hint) > 127 or len(hint) < 0:
                 raise AssertionError("Hint must be from 0 to 127 characters in length. Hint passed is '"+hint+"'")
         self.hint = hint
+        self.type_val = 7  # The internal field identifier--used for the DAT file
 
     def __str__(self):
         return_str = "    Map Hint Field (type=7)\n"
@@ -236,7 +243,7 @@ class CCMapHintField(CCField):
         return hint_bytes
 
 
-##HERE FOR REFERNECE, BUT NOT SUPPORTED
+##HERE FOR REFERENCE, BUT NOT SUPPORTED
 ##MAKE SURE YOU USE CCEncodedPasswordField for PASSWORDS
 class CCPasswordField(CCField):
     """A class defining an unencoded password
@@ -250,6 +257,7 @@ class CCPasswordField(CCField):
             if len(password) > 9 or len(password) < 4:
                 raise AssertionError("Password must be from 4 to 9 characters in length. Password passed is '"+password+"'")
         self.password = password
+        self.type_val = 8  # The internal field identifier--used for the DAT file
 
     def __str__(self):
         return_str = "    Password Field (type=8)\n"
@@ -275,6 +283,7 @@ class CCMonsterMovementField(CCField):
             if len(monsters) > 128:
                 raise AssertionError("Max monster count of 128 exceeded. Number of monsters passed = "+str(len(monsters)))
         self.monsters = monsters
+        self.type_val = 10  # The internal field identifier--used for the DAT file
 
     def __str__(self):
         return_str = "    Monster Movement Field (type=10)\n"
